@@ -19,8 +19,26 @@ export default function Command() {
   const filteredProjects = searchText
     ? projects.filter((project) => {
         const projectLower = project.toLowerCase();
+
+        // Handle space-separated terms (exact substring matching)
         const searchTerms = searchText.toLowerCase().split(/\s+/).filter(Boolean);
-        return searchTerms.every((term) => projectLower.includes(term));
+        if (searchTerms.length > 1) {
+          return searchTerms.every((term) => projectLower.includes(term));
+        }
+
+        // Handle single-term character skipping
+        const term = searchText.toLowerCase();
+        let projectIdx = 0;
+        let termIdx = 0;
+
+        while (projectIdx < projectLower.length && termIdx < term.length) {
+          if (projectLower[projectIdx] === term[termIdx]) {
+            termIdx++;
+          }
+          projectIdx++;
+        }
+
+        return termIdx === term.length;
       })
     : projects;
 
